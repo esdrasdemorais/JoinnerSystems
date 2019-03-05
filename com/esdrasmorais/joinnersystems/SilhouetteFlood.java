@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.ArrayList;
-//import com.esdrasmorais.joinnersystems.Silhouette;
 
 public class SilhouetteFlood {
     protected Integer numberCases;
@@ -25,13 +24,14 @@ public class SilhouetteFlood {
     
     private void setSilhouette(String line) throws Exception {
         this.silhouette = new Silhouette();
-        this.silhouette.setHeight(0);
         this.silhouette.setWidth(Integer.parseInt(line));
+        this.silhouette.setHeight(0);
     }
 
     private void setPositions(String line) throws Exception {
         String[] positions = line.split(" ");
         List<Integer> filledPositions = new ArrayList<>();
+        System.out.println(this.silhouette.getWidth());
         for (String p : positions) {
             Integer height = Integer.parseInt(p);
             this.silhouette.setHeight(
@@ -42,7 +42,7 @@ public class SilhouetteFlood {
             System.out.print(p+" ");
             filledPositions.add(height);
         }
-        System.out.print("\n+++\n");
+        System.out.print("\n");
         this.silhouette.setFilledPositions(filledPositions);
     }
 
@@ -58,7 +58,6 @@ public class SilhouetteFlood {
             String line;
             Integer i = 0;
             while ((line = br.readLine()) != null) {
-                System.out.print(line);System.exit(0);
                 if (i == 0) {
                     this.numberCases = Integer.parseInt(line);
                 } else if (i % 2 == 0) {
@@ -78,8 +77,27 @@ public class SilhouetteFlood {
         this.response += result + "\n";
     }
 
+    protected void calculateBySilhouette(Silhouette silhouette) {
+    	Integer result = 0, i = 0, heightPrevious = 0;
+    	List<Integer> filledPositions = silhouette.getFilledPositions();
+    	for (Integer height : filledPositions) {
+    		if (i > 0 && i < silhouette.getWidth() && height > 0) {
+    			if (height <= heightPrevious)
+    				result += heightPrevious - height;
+    		}
+System.out.println("    i= "+i+" , h="+height+
+		" , ant - height= " + heightPrevious + " - " + height + 
+		", res="+result);
+    		i++;
+    		heightPrevious = height > heightPrevious ? height : heightPrevious;
+    	}
+    	this.addLine(result);
+    }
+    
     protected void calculate() {
-                  
+    	for (Silhouette silhouette : this.silhouettes) {
+    		this.calculateBySilhouette(silhouette);
+    	}
     }
 
     protected void saveResponse() {
