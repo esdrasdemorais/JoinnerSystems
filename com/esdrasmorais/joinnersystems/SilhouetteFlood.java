@@ -78,20 +78,34 @@ public class SilhouetteFlood {
     }
 
     protected void calculateBySilhouette(Silhouette silhouette) {
-    	Integer result = 0, i = 0, heightPrevious = 0;
+    	Integer result = 0, i = 0, heightPrevious = 0, iBiggest = 1, last = 0;
     	List<Integer> filledPositions = silhouette.getFilledPositions();
+		Integer w = silhouette.getWidth();
     	for (Integer height : filledPositions) {
-    		if (i > 0 && i < silhouette.getWidth() && height > 0) {
-    			if (height <= heightPrevious)
-    				result += heightPrevious - height;
+			last = i + 1 == w - 1 ? i : 0;
+    		if (i == 0 || i >= w - 1 || height <= 0) {
+    			i = i == 0 ? 1 : i + 1;
+    			heightPrevious = height;
+    			continue;
     		}
-System.out.println("    i= "+i+" , h="+height+
-		" , ant - height= " + heightPrevious + " - " + height + 
-		", res="+result);
-    		i++;
+    		if (height <= heightPrevious) {
+				result += heightPrevious - height;
+    		}
+    		if (filledPositions.get(iBiggest) < height) {
+    			iBiggest = i;
+    		}
+    		if (iBiggest > 0 && filledPositions.get(iBiggest) > height 
+    			&& filledPositions.get(i < w - 1 ? i + 1 : i) < height
+    			&& filledPositions.get(i - 1) < height 
+    			&& heightPrevious > height && last > 0
+    		) {
+    			Integer difference = filledPositions.get(iBiggest) - height;
+    			result -= (difference * (i - iBiggest));
+    		}
     		heightPrevious = height > heightPrevious ? height : heightPrevious;
+    		i++;
     	}
-    	this.addLine(result);
+    	this.addLine(result);	
     }
     
     protected void calculate() {
